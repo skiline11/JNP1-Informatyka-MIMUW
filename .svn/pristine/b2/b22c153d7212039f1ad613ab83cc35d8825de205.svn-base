@@ -1,0 +1,140 @@
+Dziadek matematyk pozostawił Ci w spadku piekarnię. Aby ułatwić sobie zarządzanie nią,
+postanawiasz napisać program komputerowy. Piekarnia produkuje wiele różnych wypieków, ale
+zawierają się one w kilku kategoriach. Z tego powodu program powinien bazować na typach
+szablonowych.
+
+Stwórz następujące typy szablonowe.
+
+= Plik pie.h =
+
+Klasy CherryPie<class R, R radius> i ApplePie<class R, R radius, class P>, gdzie:
+- R jest typem parametru radius
+- radius jest promieniem placka
+- P jest typem pola price
+
+Konstruktor klasy CherryPie:
+CherryPie(int initialStock)
+
+Konstruktor klasy ApplePie:
+ApplePie(int initialStock, P price)
+
+Parametr initialStock określa początkowy stan magazynowy (musi być większy od 0). Należy
+dokonać walidacji typów - R musi być typem liczbowym całkowitym, a P typem liczbowym
+zmiennoprzecinkowym. Podanie typów niespełniających tych kryteriów musi powodować błąd
+kompilacji.
+
+Obie klasy udostępniają metody publiczne:
+static double getArea() - wylicza powierzchnię placka, przy czym placki są idealnymi
+  kołami
+int getStock() - podaje aktualny stan magazynowy placka
+
+ApplePie udostępnia dodatkowo metody publiczne:
+void sell() - zmniejsza stock o 1, stock nie może być mniejszy od 0
+P getPrice() - podaje cenę placka
+
+Wartość liczby pi musi być wyliczona w trakcie kompilacji. Można do tego użyć dowolnego
+algorytmu. Poprawność obliczeń będzie sprawdzana przy założeniu dokładności do 6 miejsca
+po przecinku.
+
+Szablony klas CherryPie i ApplePie powinny być specjalizacją ogólnego szablonu
+Pie<R, R radius, etc> (gdzie etc to pozostałe parametry, których trzeba użyć
+w implementacji - ich dobór należy do Ciebie).
+
+= Plik cake.h =
+
+Klasy CheeseCake<class T, T length, T width> i
+CreamCake<class T, T length, T width, class P>, gdzie:
+- T jest typem parametrów length i width
+- length i width to długość i szerokość ciasta
+- P jest typem pola price
+
+Konstruktor klasy CheeseCake:
+CheeseCake(int initialStock)
+
+Konstruktor klasy CreamCake:
+CreamCake(int initialStock, P price)
+
+Podobnie jak w przypadku placków, parametry szablonowe dla ciast muszą być walidowane -
+T musi być typem liczbowym całkowitym, a P typem liczbowym zmiennoprzecinkowym. Podanie
+typów niespełniających tych kryteriów musi powodować błąd kompilacji.
+
+Obie klasy udostępniają metody publiczne:
+static double getArea() - wylicza powierzchnię ciasta, przy czym ciasta są prostokątami
+  o bokach length na width*ln(2)
+int getStock() - podaje aktualny stan magazynowy ciasta
+
+CreamCake udostępnia dodatkowo metody publiczne:
+void sell() - zmniejsza stock o 1, stock nie może być mniejszy od 0
+P getPrice() - podaje cenę ciasta
+
+Wartość ln(2) musi być wyliczona w trakcie kompilacji. Można do tego użyć dowolnego
+algorytmu. Poprawność obliczeń będzie sprawdzana przy założeniu dokładności do 6 miejsca
+po przecinku.
+
+Szablony klas CheeseCake i CreamCake powinny być specjalizacją ogólnego szablonu
+Cake<T, T length, T width, etc>.
+
+= Plik bakery.h =
+
+Klasa Bakery<class C, class A, A shelfArea, class... P>, gdzie:
+- C jest typem pola profits (dochód piekarni, początkowo wynosi 0)
+- A jest typem parametru shelfArea
+- shelfArea to dostępna przestrzeń na półkach
+- P... to typy wypieków, które są oferowane przez piekarnię
+
+Konstruktor klasy Bakery:
+Bakery(P... products)
+
+Podajemy w nim konkretne obiekty typów przekazanych jako parametry szablonu.
+
+W przypadku klasy Bakery dokonujemy następujących walidacji:
+- parametr C musi być typem liczbowym zmiennoprzecinkowym
+- parametr A musi być typem liczbowym całkowitym
+- typy zawarte w ramach parametru P muszą być unikatowe
+- produkty w piekarni nie mogą mieć łącznej powierzchni większej niż przestrzeń na półkach
+- typ wymiaru wszystkich produktów w piekarni musi być taki sam jak typ A
+- typ ceny wszystkich produktów (przeznaczonych na sprzedaż) w piekarni musi być taki sam
+  jak typ C
+
+Niespełnienie któregokolwiek z tych warunków musi skutkować błędem kompilacji.
+
+Klasa Bakery udostępnia metody publiczne:
+- C getProfits() - podaje dochody piekarni
+- template <class Product> void sell() - dokonuje sprzedaży produktu o typie Product,
+  zmniejszając jego stock o 1 i zwiększając dochód piekarni o jego cenę; jeśli stock 
+  wynosi 0, sprzedaż nie ma żadnego efektu; podanie typu, który nie występuje na stanie 
+  piekarni albo nie jest na sprzedaż (CherryPie i CheeseCake) musi powodować błąd 
+  kompilacji
+- template <class Product> int getProductStock() - pobiera stan magazynowy produktu
+  o typie Product; podanie typu, który nie występuje na stanie piekarni musi powodować 
+  błąd kompilacji
+- template <class Product> restock(int additionalStock) - jeśli Product jest typem
+  ApplePie i występuje na stanie piekarni, to zwiększ jego stock o additionalStock;
+  w przeciwnym przypadku powinien wystąpić błąd kompilacji
+
+Wszystkie komunikaty o błędzie kompilacji muszą zawierać stosowne opisy.
+
+Przykład użycia znajduje się w pliku bakery_example.cc.
+
+W tym zadaniu wymagane jest użycie kompilatora g++ w wersji 7.2.0 lub nowszej (można 
+opierać się na instalacji z maszyny students). Opcjonalnie można również zweryfikować 
+działanie kodu z użyciem kompilatora Clang w wersji 5 lub nowszej.
+
+Rozwiązania będą kompilowane z użyciem poniższej komendy:
+
+g++ -Wall -Wextra -std=c++17 -O2
+
+Rozwiązanie powinno składać się z plików pie.h, cake.h oraz bakery.h. Pliki te należy
+umieścić w repozytorium w katalogu
+
+grupaN/zadanie4/ab123456+cd123456
+
+lub
+
+grupaN/zadanie4/ab123456+cd123456+ef123456
+
+gdzie N jest numerem grupy, a ab123456, cd123456, ef123456 są identyfikatorami
+członków zespołu umieszczającego to rozwiązanie.
+Katalog z rozwiązaniem nie powinien zawierać innych plików, ale może zawierać
+podkatalog private, gdzie można umieszczać różne pliki, np. swoje testy. Pliki
+umieszczone w tym podkatalogu nie będą oceniane.

@@ -1,0 +1,86 @@
+#include <iostream>
+#include "decoration.h"
+
+void GlassBall::doOperation(std::ostream& os) {
+	if(status == Okay && randomNumber()%4 == 0) status = Broken;
+	
+	os << name << ": ";
+	switch(status) {
+		case Okay: os << "OK" << std::endl; break;
+		case Broken: os << "broken" << std::endl; break;
+	}
+}
+
+void Lights::doOperation(std::ostream& os) {
+	os << name << ": ";
+	
+	switch(status) {
+		case Off:      status = Constant; os << "constant" << std::endl; break;
+		case Constant: status = Blinking; os << "blinking" << std::endl; break;
+		case Blinking: status = Off;      os << "off" << std::endl;      break;
+	}
+}
+
+void Tree::doOperation(std::ostream& os) {
+	int percent = 100-(currentDate()-cut_date)/1000;
+	
+	os << name << ": " << percent << "% of tree covered with needles" << std::endl;
+}
+
+void ChristmasTree::doOperation(std::ostream& os) {
+	for(DecorationPtr decoration: christmasTreeDecorations) {
+		decoration->doOperation(os);
+	}
+}
+
+Price ChristmasTree::getPrice() const {
+	Price sumPrices;
+	for(DecorationPtr decoration : christmasTreeDecorations) {
+		sumPrices = sumPrices + decoration->getPrice();
+	}
+	return sumPrices;
+}
+
+DecorationIterator ChristmasTree::addDecoration(DecorationPtr ptr_to_decoration) {
+	christmasTreeDecorations.push_back(ptr_to_decoration);
+	notify();
+	return std::prev(christmasTreeDecorations.end());
+}
+
+void ChristmasTree::removeDecoration(DecorationIterator it) {
+	if(it != end()) {
+		christmasTreeDecorations.erase(it);
+	}
+	else throw invalid_iterator_error();
+}
+
+DecorationIterator ChristmasTree::begin() {
+	return christmasTreeDecorations.begin();
+}
+
+DecorationIterator ChristmasTree::end() {
+	return christmasTreeDecorations.end();
+}
+
+PersonIterator ChristmasTree::attachObserver(PersonPtr observer) {
+	observers.push_back(observer);
+	return std::prev(observers.end());
+}
+
+void ChristmasTree::detachObserver(PersonIterator observer) {
+	observers.erase(observer);
+}
+
+void ChristmasTree::notify() const {
+	for(auto & single_observer : observers) {
+		single_observer->receive_notification(*this);
+	}
+}
+
+DecorationPtr ChristmasTree::getLastDecoration() const {
+	if(not christmasTreeDecorations.empty()) {
+		return *std::prev(christmasTreeDecorations.end());
+	}
+	else throw empty_tree_error();
+}
+

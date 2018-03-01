@@ -1,0 +1,46 @@
+#ifndef PERSON_H_
+#define PERSON_H_
+
+#include <string>
+#include "helper.h"
+
+class Person;
+class ChristmasTree;
+
+#include "decoration.h"
+
+class Person {
+	protected:
+		std::string name;
+	
+	public:
+		virtual ~Person() = default;
+		std::string getName() const { return name; }
+		virtual void receive_notification(const ChristmasTree& christmasTree) const = 0;
+};
+
+class Adult : public Person {
+	private:
+		Price savings;
+	
+	public:
+		Adult(const std::string& name, Price savings = Price()) :
+		savings(savings) {
+			this->name = name;
+		}
+		
+		void buyDecoration(Decoration& decoration);
+		Price getSavings() const;
+		void receive_notification(const ChristmasTree& christmasTree) const;
+};
+
+class Child : public Person {
+	public:
+		Child(const std::string& name) {
+			this->name = name;
+		}
+		
+		void receive_notification(const ChristmasTree& christmasTree) const;
+};
+
+#endif  // PERSON_H_
